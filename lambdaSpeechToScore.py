@@ -42,22 +42,22 @@ def lambda_handler(event, context):
         }
 
     
-    with tempfile.NamedTemporaryFile(suffix=".ogg", delete=True) as tmp:
-        tmp.write(file_bytes)
-        tmp.flush()
-        tmp_name = tmp.name
-        signal, fs = audioread_load(tmp_name)
+    start = time.time()
+    random_file_name = './'+utilsFileIO.generateRandomString()+'.ogg'
+    f = open(random_file_name, 'wb')
+    f.write(file_bytes)
+    f.close()
+    print('Time for saving binary in file: ', str(time.time()-start))
+    start = time.time()
+    signal, fs = audioread_load(random_file_name)
     signal = transform(torch.Tensor(signal)).unsqueeze(0)
-
+    print('Time for loading .ogg file file: ', str(time.time()-start))
 
     result = trainer_SST_lambda[language].processAudioForGivenText(
         signal, real_text)
-
-    #start = time.time()
-    #os.remove(random_file_name)
-    #print('Time for deleting file: ', str(time.time()-start))
-
     start = time.time()
+    os.remove(random_file_name)
+    print('Time for deleting file: ', str(time.time()-start))
     real_transcripts_ipa = ' '.join(
         [word[0] for word in result['real_and_transcribed_words_ipa']])
     matched_transcripts_ipa = ' '.join(
@@ -98,7 +98,6 @@ def lambda_handler(event, context):
            'is_letter_correct_all_words': is_letter_correct_all_words}
 
     return json.dumps(res)
-
 
 
 def audioread_load(path, offset=0.0, duration=None, dtype=np.float32):

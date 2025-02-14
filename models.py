@@ -1,40 +1,31 @@
 import torch
+import whisper
 import torch.nn as nn
 import pickle
 from ModelInterfaces import IASRModel
 from AIModels import NeuralASR 
 
-def getASRModel(language: str,use_whisper:bool=True) -> IASRModel:
-
-    if use_whisper:
-        from whisper_wrapper import WhisperASRModel
-        return WhisperASRModel()
-    
+def getASRModel(language: str) -> whisper.Whisper:
     if language == 'de':
 
-        model, decoder, utils = torch.hub.load(repo_or_dir='snakers4/silero-models',
-                                               model='silero_stt',
-                                               language='de',
-                                               device=torch.device('cpu'))
-        model.eval()
-        return NeuralASR(model, decoder)
+        model = whisper.load_model("medium", )
+        supported_languages ='de'
+        if language not in supported_languages:
+            raise ValueError(f"Language {language} is not supported. Supported languages are: {supported_languages}")
 
     elif language == 'en':
-        model, decoder, utils = torch.hub.load(repo_or_dir='snakers4/silero-models',
-                                               model='silero_stt',
-                                               language='en',
-                                               device=torch.device('cpu'))
-        model.eval()
-        return NeuralASR(model, decoder)
+        model = whisper.load_model("medium", )
+        supported_languages = 'en'
+        if language not in supported_languages:
+            raise ValueError(f"Language {language} is not supported. Supported languages are: {supported_languages}")
+
     elif language == 'fr':
-        model, decoder, utils = torch.hub.load(repo_or_dir='snakers4/silero-models',
-                                               model='silero_stt',
-                                               language='fr',
-                                               device=torch.device('cpu'))
-        model.eval()
-        return NeuralASR(model, decoder)
-    else:
-        raise ValueError('Language not implemented')
+        model = whisper.load_model("medium", )
+        supported_languages ='fr'
+        if language not in supported_languages:
+            raise ValueError(f"Language {language} is not supported. Supported languages are: {supported_languages}")
+    return (model)
+
 
 
 def getTTSModel(language: str) -> nn.Module:
