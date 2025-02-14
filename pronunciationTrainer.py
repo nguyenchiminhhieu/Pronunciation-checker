@@ -13,24 +13,13 @@ import time
 
 
 def getTrainer(language: str):
+    
     device = torch.device('cpu')
-    model = mo.getASRModel(language)
+    model, decoder = mo.getASRModel(language)
     model = model.to(device)
     model.eval()
+    asr_model = AIModels.NeuralASR(model, decoder)
     
-    # Tạo wrapper class mới cho Whisper model
-    class WhisperASR(AIModels.NeuralASR):
-        def __init__(self, model):
-            self.model = model
-            
-        def transcribe(self, audio):
-            result = self.model.transcribe(audio)
-            return result["text"]
-    
-    # Sử dụng wrapper class mới
-    asr_model = WhisperASR(model)
-    
-    # Phần xử lý phonem converter giữ nguyên
     if language == 'de':
         phonem_converter = RuleBasedModels.EpitranPhonemConverter(
             epitran.Epitran('deu-Latn'))
@@ -38,9 +27,10 @@ def getTrainer(language: str):
         phonem_converter = RuleBasedModels.EngPhonemConverter()
     else:
         raise ValueError('Language not implemented')
-    
-    trainer = PronunciationTrainer(asr_model, phonem_converter)
-    
+
+    trainer = PronunciationTrainer(
+        asr_model, phonem_converter)
+
     return trainer
 
 

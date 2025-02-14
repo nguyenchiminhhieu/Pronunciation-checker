@@ -5,26 +5,26 @@ import pickle
 from ModelInterfaces import IASRModel
 from AIModels import NeuralASR 
 
-def getASRModel(language: str) -> whisper.Whisper:
+def getASRModel(language: str) -> nn.Module:
     if language == 'de':
 
-        model = whisper.load_model("medium", )
-        supported_languages ='de'
-        if language not in supported_languages:
-            raise ValueError(f"Language {language} is not supported. Supported languages are: {supported_languages}")
+        model, decoder, utils = torch.hub.load(repo_or_dir='snakers4/silero-models',
+                                               model='silero_stt',
+                                               language='de',
+                                               device=torch.device('cpu'))
 
     elif language == 'en':
-        model = whisper.load_model("medium", )
-        supported_languages = 'en'
-        if language not in supported_languages:
-            raise ValueError(f"Language {language} is not supported. Supported languages are: {supported_languages}")
+        model, decoder, utils = torch.hub.load(repo_or_dir='snakers4/silero-models',
+                                               model='silero_stt',
+                                               language='en',
+                                               device=torch.device('cpu'))
 
     elif language == 'fr':
-        model = whisper.load_model("medium", )
-        supported_languages ='fr'
-        if language not in supported_languages:
-            raise ValueError(f"Language {language} is not supported. Supported languages are: {supported_languages}")
-    return (model)
+        model, decoder, utils = torch.hub.load(repo_or_dir='snakers4/silero-models',
+                                               model='silero_stt',
+                                               language='fr',
+                                               device=torch.device('cpu'))
+    return (model, decoder)
 
 
 
